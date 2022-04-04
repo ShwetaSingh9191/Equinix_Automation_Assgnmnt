@@ -4,12 +4,12 @@ import PageObjects.MainPage;
 import PageObjects.MainPageInDiffLang;
 import PageObjects.SearchResultPage;
 import Utils.Base;
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
@@ -33,14 +33,17 @@ public class WikiStepDefinitionFile extends Base {
     }
 
 
-    @After
-    public void logout_and_close_browser(Scenario scenario) throws Throwable {
+    @After(order=1)
+    public void capture_screenshot(Scenario scenario) throws Throwable {
+        //validate if scenario has failed and generate screenshot on failure
         if (scenario.isFailed()) {
-            // Take a screenshot...
             final byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-            scenario.embed(screenshot, "image/png"); // ... and embed it in the report.
+            scenario.attach(screenshot, "image/png", "image");
         }
-        Thread.sleep(5000);
+    }
+
+        @After(order=0)
+        public void logout_and_close_browser() throws Throwable {
         driver.close();
         log.info("Closed browser");
     }
